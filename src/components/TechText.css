@@ -1,0 +1,16 @@
+.tech-text {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.tech-text-canvas {
+  display: block;
+  position: absolute;
+  /* Canvas 扩展到 hero 范围，使拖拽时文字不被裁切 */
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}

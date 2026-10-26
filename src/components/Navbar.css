@@ -1,0 +1,114 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  transition: all 0.4s var(--ease-out);
+  background: transparent;
+}
+
+.navbar--scrolled {
+  background: rgba(10, 10, 12, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.navbar__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 48px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar__logo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.navbar__logo-mark {
+  display: inline-block;
+}
+
+.navbar__logo-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+  animation: pulse 2s var(--ease-in-out) infinite;
+}
+
+.navbar__links {
+  display: flex;
+  gap: 36px;
+  align-items: center;
+}
+
+.navbar__link {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  transition: color 0.3s var(--ease-out);
+  cursor: pointer;
+  position: relative;
+}
+
+.navbar__link:hover {
+  color: var(--text-primary);
+}
+
+.navbar__link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.3s var(--ease-out);
+}
+
+.navbar__link:hover::after {
+  width: 100%;
+}
+
+.navbar__cta {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bg-primary);
+  background: var(--accent);
+  padding: 9px 20px;
+  border-radius: 100px;
+  transition: all 0.3s var(--ease-out);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.navbar__cta:hover {
+  box-shadow: 0 0 24px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .navbar__inner {
+    padding: 0 24px;
+  }
+  .navbar__links {
+    display: none;
+  }
+}

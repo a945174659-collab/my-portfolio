@@ -1,0 +1,16 @@
+.app {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  position: relative;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* 全局滚动时给body加背景渐变增强暗色层次感 */
+body {
+  background: var(--bg-primary);
+}
