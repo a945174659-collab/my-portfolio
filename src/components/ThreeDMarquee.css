@@ -1,0 +1,175 @@
+/* ===== 3D Marquee 组件样式 =====
+ * 严格对应 Figma「3D Marquee Area」(50:611)
+ *   外层 1920×1080，opacity 0.5，裁切
+ *   23 张 312×176 横版封面，各自 matrix() 仿射变换（含 skew）
+ *   mask：CSS mask-image 裁切图片组，右侧显示 → 左侧隐藏
+ */
+
+/* ---------- scatter 方案（设计稿首屏） ---------- */
+.tdm-scatter {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Figma frame opacity 0.5 */
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 图片组：1920×1080 坐标系
+ * 注意：Figma 中子节点的 relativeTransform 已内含 -17° 旋转，
+ * 因此这里容器保持不旋转，仅作为 1920×1080 的定位基准。
+ *
+ * mask（参考 Figma 52:30「mask-mask」渐变方向，按视觉参考效果实现）：
+ *   渐变方向 -92.36°（从右向左，略带倾斜，还原 Figma gradientTransform 轴向）
+ *   右侧 28% 完全显示 → 中间 34% 过渡 → 左侧 38% 完全隐藏
+ *   使用 rgba alpha 控制（非 #fff/#000），确保默认 alpha mask 模式生效
+ *   外层另有 50% opacity。
+ */
+.tdm-scatter-group {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 1920px;
+  height: 1080px;
+  pointer-events: none;
+  transform-origin: 100% 100%;
+  /* mask-mode 必须设为 luminance，否则默认 alpha 模式下
+     #fff 和 #000 的 alpha 都是 1，mask 不生效 */
+  -webkit-mask-image: linear-gradient(
+    -93deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 28%,
+    rgba(255, 255, 255, 0) 62%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  mask-image: linear-gradient(
+    -93deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 28%,
+    rgba(255, 255, 255, 0) 62%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+/* 单张封面容器：外层负责逐张微动（framer-motion 控制 x/y），
+ * 不再承载 Figma 矩阵（已移至 .tdm-scatter-frame）。
+ * 注意：item 尺寸 = box.w × box.h，frame 在其内部靠 matrix 平移到目标位置，
+ * 因此 item 自身 overflow 必须 visible，否则 frame 平移后会被裁掉。 */
+.tdm-scatter-item {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: transform, opacity;
+}
+
+/* 仿射层：承载 Figma matrix(a,b,c,d,e,f)，
+ * 尺寸/位置与原 .tdm-scatter-item 完全一致（transform-origin 0 0），
+ * 此处 overflow:hidden + pointer-events:auto 才是真正的「可悬停图片区」。 */
+.tdm-scatter-frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  pointer-events: auto;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* 整组漂移层：沿红色箭头轴（左上 ↔ 右下，约 -55°）慢速往复。
+ * 放在 .tdm-scatter 与 .tdm-scatter-group 之间，
+ * 不影响 group 的 mask / scale，也不被 framer-motion 接管。
+ * 幅度 ±(14,∓20)px ≈ 屏宽 1.5%，仅做呼吸感，不抢标题焦点。 */
+.tdm-scatter-drift {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+  animation: tdmDrift 26s ease-in-out infinite alternate;
+}
+
+@keyframes tdmDrift {
+  0% {
+    transform: translate3d(-14px, 20px, 0);
+  }
+  100% {
+    transform: translate3d(14px, -20px, 0);
+  }
+}
+
+/* 尊重用户的「减少动态效果」系统偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .tdm-scatter-drift {
+    animation: none;
+  }
+}
+
+/* 封面图：FILL 填充模式 */
+.tdm-scatter-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Figma cornerRadius 0 */
+  border-radius: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 无需独立 mask div —— mask 直接通过 mask-image 应用到 scatter-group 上 */
+
+/* ---------- grid 方案（4×5 竖版网格，备用） ---------- */
+.tdm-viewport--grid {
+  position: relative;
+  display: block;
+  width: 1000px;
+  height: 700px;
+  overflow: visible;
+  transform: rotate(-18deg);
+  transform-origin: center center;
+  pointer-events: auto;
+}
+
+.tdm-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 118px);
+  gap: 16px;
+  width: max-content;
+  transform-origin: 0 0;
+  margin-top: 60px;
+}
+
+.tdm-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tdm-image-cell {
+  position: relative;
+}
+
+.tdm-image {
+  display: block;
+  width: 118px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(10, 10, 12, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+
+.tdm-image:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 响应式：整体等比缩放，右下角固定 ---------- */
+/* 连续缩放：取宽高比例的较大值，确保两个方向都不留白。
+   ≤1920×1080 时缩小（max < 1），>1920×1080 时放大（max > 1）。
+   额外 ×1.045 放大余量：漂移动画（±14/±20px）时右下角不露黑边。 */
+.tdm-scatter-group {
+  transform: scale(calc(max(calc(100vw / 1920), calc(100vh / 1080)) * 1.045));
+}

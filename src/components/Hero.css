@@ -1,12 +1,9 @@
 .hero {
   position: relative;
   height: 100vh;
-  min-height: 760px;
+  min-height: 860px;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  /* 各层绝对定位，避免 flex 布局影响绝对定位的作品墙 */
   overflow: hidden;
 }
 
@@ -156,13 +153,50 @@
 
 /* ===== Content ===== */
 .hero__content {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  /* 文字层需高于作品墙（z-index: 0），保证标题清晰可读 */
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   max-width: var(--max-width);
   width: 100%;
-  margin: 0 auto;
   padding: 0 48px;
-  padding-top: var(--nav-height);
+  pointer-events: none;
+}
+
+/* 文案内部恢复交互 */
+.hero__left {
+  pointer-events: auto;
+}
+
+/* 左侧文案栏 —— 占据首屏左侧，右侧留给作品墙 */
+.hero__left {
+  min-width: 0;
+  max-width: 620px;
+}
+
+/* 右侧 3D 作品墙
+   Figma「3D Marquee Area」(50:611) 为 1920×1080 全屏容器，
+   内含 22 张散落横版封面（旋转 -17deg）+ 渐变 mask。
+   此处按 Hero 尺寸铺满，配合内部 scale 做响应式。 */
+.hero__right {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* 位于文字层下方，文字优先 */
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 作品墙内部恢复交互（图片悬停）。
+ * 拆出 .tdm-scatter-frame 后，可悬停区从 item 迁移到 frame：
+ * item 覆盖 1920×1080 全幅且 pointer-events:none，
+ * 否则会挡住左侧文字区的鼠标事件。 */
+.hero__right .tdm-scatter-frame {
+  pointer-events: auto;
 }
 
 .hero__label {
@@ -361,13 +395,51 @@
   animation: scrollHint 1.5s var(--ease-in-out) infinite;
 }
 
+/* ===== 响应式 ===== */
+@media (max-width: 1024px) {
+  .hero__left {
+    max-width: 52%;
+  }
+}
+
 @media (max-width: 768px) {
-  .hero__content {
-    padding: 0 24px;
+  /* 移动端：Hero 改为常规流式布局
+     顺序：文案 → 作品墙 → 底部信息条 */
+  .hero {
+    height: auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
     padding-top: var(--nav-height);
   }
+  .hero__content {
+    position: static;
+    transform: none;
+    padding: 32px 24px 0;
+  }
+  .hero__left {
+    max-width: none;
+  }
+  /* 移动端：作品墙置于文字下方（DOM 中在 content 之前，用 order 调整） */
+  .hero__right {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 400px;
+    margin-top: 24px;
+    order: 2;
+  }
+  .hero__content {
+    order: 1;
+  }
   .hero__meta {
-    padding: 0 24px;
+    order: 3;
+  }
+  .hero__meta {
+    position: static;
+    padding: 32px 24px 48px;
     gap: 24px;
     flex-wrap: wrap;
   }

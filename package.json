@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@jany555/image-cli": "^1.6.4",
+    "framer-motion": "^14.6.0",
     "lenis": "^1.3.26",
     "matter-js": "^0.20.0",
     "react": "^18.3.1",
